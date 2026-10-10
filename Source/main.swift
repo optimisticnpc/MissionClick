@@ -1,6 +1,29 @@
 import AppKit
 import ApplicationServices
 import Darwin
+import ServiceManagement
+
+enum LoginItem {
+    static var status: SMAppService.Status { SMAppService.mainApp.status }
+
+    static var statusText: String {
+        switch status {
+        case .enabled: return "enabled"
+        case .requiresApproval: return "requires approval"
+        case .notRegistered: return "disabled"
+        case .notFound: return "unavailable"
+        @unknown default: return "unknown"
+        }
+    }
+
+    static func setEnabled(_ enabled: Bool) throws {
+        switch (enabled, status) {
+        case (true, .enabled), (true, .requiresApproval), (false, .notRegistered): return
+        case (true, _): try SMAppService.mainApp.register()
+        case (false, _): try SMAppService.mainApp.unregister()
+        }
+    }
+}
 
 // This is the sole private API: resolve a real AX window's CGWindowID. No title
 // matching, key injection, force quit, screen capture, or simulated app activation.
@@ -63,6 +86,7 @@ final class MissionClick: NSObject, NSApplicationDelegate, NSMenuDelegate {
     var menu: NSMenu!
     var statusLine: NSMenuItem!
     var enabledItem: NSMenuItem!
+    var loginItem: NSMenuItem!
     var resultItem: NSMenuItem!
     var tap: CFMachPort?
     var source: CFRunLoopSource?
@@ -87,6 +111,7 @@ final class MissionClick: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusLine = menu.addItem(withTitle: "", action: nil, keyEquivalent: "")
         menu.addItem(.separator())
         enabledItem = addItem("Enable right-click to close", action: #selector(toggleEnabled))
+        loginItem = addItem("Launch at login", action: #selector(toggleLaunchAtLogin))
         addItem("Setup & instructions…", action: #selector(showSetup))
         addItem("Open Accessibility Settings…", action: #selector(openAccessibility))
         resultItem = menu.addItem(withTitle: lastResult, action: nil, keyEquivalent: "")
@@ -111,6 +136,17 @@ final class MissionClick: NSObject, NSApplicationDelegate, NSMenuDelegate {
         statusLine.title = windowIDFunction == nil ? "Unsupported macOS interface" :
             (!AXIsProcessTrusted() ? "Waiting for Accessibility access" : (tap == nil ? "Unable to monitor clicks" : "Ready"))
         enabledItem.state = enabled ? .on : .off
+        switch LoginItem.status {
+        case .enabled:
+            loginItem.title = "Launch at login"
+            loginItem.state = .on
+        case .requiresApproval:
+            loginItem.title = "Launch at login (approval required)"
+            loginItem.state = .mixed
+        default:
+            loginItem.title = "Launch at login"
+            loginItem.state = .off
+        }
         resultItem.title = lastResult
     }
 
@@ -194,6 +230,28 @@ final class MissionClick: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc func toggleEnabled() { enabled.toggle(); refreshMenu() }
+    @objc func toggleLaunchAtLogin() {
+        let enable = LoginItem.status != .enabled && LoginItem.status != .requiresApproval
+        do {
+            try LoginItem.setEnabled(enable)
+            lastResult = "Launch at login: \(LoginItem.statusText)."
+            if LoginItem.status == .requiresApproval {
+                SMAppService.openSystemSettingsLoginItems()
+            }
+        } catch {
+            lastResult = "Could not change launch at login."
+            let alert = NSAlert()
+            alert.messageText = "Could not change launch at login"
+            alert.informativeText = error.localizedDescription
+            alert.addButton(withTitle: "Open Login Items Settings")
+            alert.addButton(withTitle: "OK")
+            NSApp.activate(ignoringOtherApps: true)
+            if alert.runModal() == .alertFirstButtonReturn {
+                SMAppService.openSystemSettingsLoginItems()
+            }
+        }
+        refreshMenu()
+    }
     @objc func quit() { NSApp.terminate(nil) }
     @objc func openAccessibility() {
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
@@ -236,7 +294,24 @@ if CommandLine.arguments.contains("--diagnose") {
     print("Accessibility: \(AXIsProcessTrusted())")
     print("Window ID interface: \(windowIDFunction != nil)")
     print("Mission Control detected: \(WindowSelection.missionControlIsVisible(windowEntries(), dockPID: dockPID()))")
+    print("Launch at login: \(LoginItem.statusText)")
     exit(0)
+}
+
+if CommandLine.arguments.contains("--login-status") {
+    print("Launch at login: \(LoginItem.statusText)")
+    exit(0)
+}
+
+if CommandLine.arguments.contains("--enable-login") || CommandLine.arguments.contains("--disable-login") {
+    do {
+        try LoginItem.setEnabled(CommandLine.arguments.contains("--enable-login"))
+        print("Launch at login: \(LoginItem.statusText)")
+        exit(LoginItem.status == .requiresApproval ? 2 : 0)
+    } catch {
+        fputs("Could not change launch at login: \(error.localizedDescription)\n", stderr)
+        exit(1)
+    }
 }
 
 let application = NSApplication.shared

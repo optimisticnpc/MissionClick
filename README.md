@@ -11,7 +11,13 @@ The right-click interaction in Mission Control has been manually confirmed to wo
 2. Click **Open Accessibility Settings** in its setup window. Enable **MissionClick** under **System Settings → Privacy & Security → Accessibility**. If it is not listed, use the `+` button to add this app.
 3. Close the setup window, open Mission Control as usual, and right-click a window preview. On a trackpad, use the normal two-finger secondary click.
 
-The menu bar icon provides an enable toggle, setup instructions, last action status, and Quit. Permission changes are picked up automatically. It does not start automatically at login.
+The menu bar icon provides an enable toggle, **Launch at login**, setup instructions, last action status, and Quit. Permission changes are picked up automatically.
+
+## Launch at login
+
+Turn on **Launch at login** in the MissionClick menu to start it automatically when you sign in to your Mac. Turn it off in the same menu to stop automatic launches.
+
+The checkmark reflects the current macOS setting. If approval is required, MissionClick opens Login Items settings so you can approve it. Keep the app in one location after enabling this option. Launch at login is optional and is off until you enable it.
 
 ## Behaviour and limits
 

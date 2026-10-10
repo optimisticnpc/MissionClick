@@ -5,7 +5,7 @@ TASK_APP="$TASK_ROOT/MissionClick.app"
 TASK_CACHE="$TASK_ROOT/.build/swift-module-cache"
 mkdir -p "$TASK_APP/Contents/MacOS" "$TASK_CACHE"
 xcrun swiftc -swift-version 5 -O -module-cache-path "$TASK_CACHE" \
-  -framework AppKit -framework ApplicationServices \
+  -framework AppKit -framework ApplicationServices -framework ServiceManagement \
   "$TASK_ROOT/Source/WindowTarget.swift" "$TASK_ROOT/Source/main.swift" \
   -o "$TASK_APP/Contents/MacOS/MissionClick"
 cat > "$TASK_APP/Contents/Info.plist" <<'PLIST'
@@ -17,8 +17,8 @@ cat > "$TASK_APP/Contents/Info.plist" <<'PLIST'
 <key>CFBundleDisplayName</key><string>MissionClick</string>
 <key>CFBundleExecutable</key><string>MissionClick</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>0.1.0</string>
-<key>CFBundleVersion</key><string>1</string>
+<key>CFBundleShortVersionString</key><string>0.2.0</string>
+<key>CFBundleVersion</key><string>2</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>LSUIElement</key><true/>
 <key>NSHighResolutionCapable</key><true/>
