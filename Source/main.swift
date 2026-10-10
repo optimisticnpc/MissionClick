@@ -314,6 +314,15 @@ if CommandLine.arguments.contains("--enable-login") || CommandLine.arguments.con
     }
 }
 
+// Launch Services can find several builds with the same bundle identifier.
+// Only one copy should install an event tap, even if a second app is opened.
+if let identifier = Bundle.main.bundleIdentifier,
+   let existing = NSRunningApplication.runningApplications(withBundleIdentifier: identifier)
+    .first(where: { $0.processIdentifier != getpid() && !$0.isTerminated }) {
+    existing.activate(options: [])
+    exit(0)
+}
+
 let application = NSApplication.shared
 let delegate = MissionClick()
 application.delegate = delegate

@@ -7,7 +7,7 @@ The right-click interaction in Mission Control has been manually confirmed to wo
 ## Start
 **Honestly just copy the Github link to your AI of choice and tell it to get it to work :)**
 
-1. Build the app with `zsh build.sh`, then open `MissionClick.app` in this folder. Keep it in one location after granting permission.
+1. Build the app with `zsh build.sh`, then move `MissionClick.app` into Applications and open it there. You can then search for **MissionClick** in Spotlight. Keep one installed copy.
 2. Click **Open Accessibility Settings** in its setup window. Enable **MissionClick** under **System Settings → Privacy & Security → Accessibility**. If it is not listed, use the `+` button to add this app.
 3. Close the setup window, open Mission Control as usual, and right-click a window preview. On a trackpad, use the normal two-finger secondary click.
 
@@ -17,7 +17,7 @@ The menu bar icon provides an enable toggle, **Launch at login**, setup instruct
 
 Turn on **Launch at login** in the MissionClick menu to start it automatically when you sign in to your Mac. Turn it off in the same menu to stop automatic launches.
 
-The checkmark reflects the current macOS setting. If approval is required, MissionClick opens Login Items settings so you can approve it. Keep the app in one location after enabling this option. Launch at login is optional and is off until you enable it.
+The checkmark reflects the current macOS setting. If approval is required, MissionClick opens Login Items settings so you can approve it. Enable this option after installing the app in Applications. Launch at login is optional and is off until you enable it.
 
 ## Behaviour and limits
 
@@ -39,10 +39,13 @@ With Xcode or Apple command line developer tools installed:
 git clone https://github.com/optimisticnpc/MissionClick.git
 cd MissionClick
 zsh build.sh
-open MissionClick.app
+cp -R MissionClick.app /Applications/
+open /Applications/MissionClick.app
 ```
 
 The result is an app built for the current Mac’s CPU, signed locally with an ad hoc signature. The app has not been notarised. Rebuilding changes the binary; macOS may require re-enabling its Accessibility permission. Build caches and test executables stay in `.build/`.
+
+If right-click closing stops working after an update, quit MissionClick, remove its old entry from Accessibility settings, add the installed app from Applications, enable it, and open it again. Only one MissionClick process runs at a time.
 
 Source files are in `Source/`. To inspect permission and system interface availability without closing any windows, run:
 
