@@ -2,7 +2,7 @@
 
 A small menu bar utility for macOS. Right-click a window preview in Mission Control to close that window.
 
-This is an early prototype. It compiles on macOS 26.6 and passes 13 window-selection checks, but the full right-click interaction in Mission Control has not yet been confirmed. It uses an undocumented macOS interface, so compatibility with future updates is uncertain.
+The right-click interaction in Mission Control has been manually confirmed to work on macOS 26.6. All 13 window-selection checks also pass.
 
 ## Start
 
@@ -22,7 +22,7 @@ The menu bar icon provides an enable toggle, setup instructions, last action sta
 - An app must expose its window and enabled close button to macOS Accessibility. Some custom app windows may not support it.
 - Targets macOS 14–26 using the Dock’s Mission Control surface. Later system versions may require an update.
 - Uses the undocumented `_AXUIElementGetWindow` interface; macOS updates can affect compatibility.
-- Runs locally with no network requests, telemetry, recording, third-party dependencies, or force-quit behavior.
+- Runs locally with no network requests, telemetry, recording, third-party dependencies, or force-quit behaviour.
 
 ## Build
 
