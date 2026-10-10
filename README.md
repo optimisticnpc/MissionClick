@@ -5,6 +5,7 @@ A small menu bar utility for macOS. Right-click a window preview in Mission Cont
 The right-click interaction in Mission Control has been manually confirmed to work on macOS 26.6. All 13 window-selection checks also pass.
 
 ## Start
+**Honestly just copy the Github link to your AI of choice and tell it to get it to work :)**
 
 1. Build the app with `zsh build.sh`, then open `MissionClick.app` in this folder. Keep it in one location after granting permission.
 2. Click **Open Accessibility Settings** in its setup window. Enable **MissionClick** under **System Settings → Privacy & Security → Accessibility**. If it is not listed, use the `+` button to add this app.
